@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride Seat Selection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background: linear-gradient(135deg, #e153ce 0%, #391a3a 100%);
+            color: white;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .ride-selection {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            width: 800px;
+            max-width: 90%;
+            margin: 50px auto;
+        }
+
+        .ride-info {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .ride-info h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .seat-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 10px;
+            margin: 30px 0;
+        }
+
+        .seat {
+            aspect-ratio: 1;
+            background: #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .seat.available {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .seat.selected {
+            background: #3498db;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .seat.booked {
+            background: #e74c3c;
+            color: white;
+            cursor: not-allowed;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .legend-available {
+            background: #4CAF50;
+        }
+
+        .legend-selected {
+            background: #3498db;
+        }
+
+        .legend-booked {
+            background: #e74c3c;
+        }
+
+        .selection-info {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 20px 0 10px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #2c3e50 0%, #1a2a3a 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(44, 62, 80, 0.3);
+        }
+
+        .error-message {
+            background: #fff3f3;
+            color: #e74c3c;
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+            margin-top: 10px;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ride-selector {
+            margin-bottom: 20px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .user-info {
+            background: rgba(44, 62, 80, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .user-info span {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Joy Ride Hub</h1>
+        </header>
+        <main>
+            <div class="ride-selection">
+                <div class="user-info">
+                    Welcome, <span id="username">Guest</span>! Entry Number: <span id="entryNumber">N/A</span>
+                </div>
+                
+                <div class="ride-selector">
+                    <label for="ride-select">Select a Ride:</label>
+                    <select id="ride-select">
+                        <option value="roller-coaster">Roller Coaster</option>
+                        <option value="ferris-wheel">Ferris Wheel</option>
+                        <option value="water-slide">Water Slide</option>
+                        <option value="haunted-house">Haunted House</option>
+                    </select>
+                </div>
+
+                <div class="ride-info">
+                    <h2 id="ride-name">Roller Coaster</h2>
+                    <p id="ride-description">Experience the thrill of our signature roller coaster with high-speed turns and loops!</p>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color legend-available"></div>
+                        <span>Available</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-selected"></div>
+                        <span>Selected</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color legend-booked"></div>
+                        <span>Booked</span>
+                    </div>
+                </div>
+
+                <div class="seat-grid" id="seat-grid">
+                    <!-- Seats will be generated dynamically -->
+                </div>
+
+                <div class="selection-info" id="selection-info">
+                    No seats selected
+                </div>
+
+                <button id="book-button">Book Selected Seats</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCyo_C5-hHmSmvfqbfdp5gA0NhxFAW5p7U",
+            authDomain: "amusmentpark-d93c8.firebaseapp.com",
+            projectId: "amusmentpark-d93c8",
+            storageBucket: "amusmentpark-d93c8.firebasestorage.app",
+            messagingSenderId: "462613440664",
+            appId: "1:462613440664:web:ebd0f80842cb32ca0f08ed",
+            measurementId: "G-QSX4M8RLYF"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Ride data
+        const rides = {
+            "roller-coaster": {
+                name: "Roller Coaster",
+                description: "Experience the thrill of our signature roller coaster with high-speed turns and loops!",
+                rows: 5,
+                cols: 8,
+                price: 10
+            },
+            "ferris-wheel": {
+                name: "Ferris Wheel",
+                description: "Enjoy breathtaking views from our giant Ferris wheel.",
+                rows: 6,
+                cols: 6,
+                price: 8
+            },
+            "water-slide": {
+                name: "Water Slide",
+                description: "Cool off on our exciting water slides with multiple twists and turns.",
+                rows: 4,
+                cols: 8,
+                price: 12
+            },
+            "haunted-house": {
+                name: "Haunted House",
+                description: "Dare to enter our spooky haunted house filled with surprises.",
+                rows: 5,
+                cols: 7,
+                price: 15
+            }
+        };
+
+        // DOM Elements
+        const usernameElement = document.getElementById('username');
+        const entryNumberElement = document.getElementById('entryNumber');
+        const rideSelect = document.getElementById('ride-select');
+        const rideNameElement = document.getElementById('ride-name');
+        const rideDescriptionElement = document.getElementById('ride-description');
+        const seatGrid = document.getElementById('seat-grid');
+        const selectionInfo = document.getElementById('selection-info');
+        const bookButton = document.getElementById('book-button');
+
+        // User data
+        let userId = null;
+        let username = null;
+        let entryNumber = null;
+        let selectedSeats = [];
+        let currentRide = "roller-coaster";
+        let bookedSeats = {};
+
+        // Check if user is logged in
+        function checkUserLogin() {
+            // Get user data from localStorage
+            username = localStorage.getItem("username");
+            entryNumber = localStorage.getItem("entryNumber");
+            userId = localStorage.getItem("userId");
+
+            if (!username || !userId) {
+                // Redirect to login page if not logged in
+                window.location.href = "user_login.html";
+                return;
+            }
+
+            // Display user info
+            usernameElement.textContent = username;
+            entryNumberElement.textContent = entryNumber;
+        }
+
+        // Initialize ride data in Firestore if it doesn't exist
+        async function initializeRideData() {
+            try {
+                for (const rideId in rides) {
+                    const rideRef = doc(db, "rides", rideId);
+                    const rideDoc = await getDoc(rideRef);
+                    
+                    if (!rideDoc.exists()) {
+                        await setDoc(rideRef, {
+                            name: rides[rideId].name,
+                            description: rides[rideId].description,
+                            bookedSeats: {}
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("Error initializing ride data:", error);
+                showError("Failed to initialize ride data: " + error.message);
+            }
+        }
+
+        // Load booked seats for current ride
+        function loadBookedSeats() {
+            const rideRef = doc(db, "rides", currentRide);
+            
+            // Listen for real-time updates
+            return onSnapshot(rideRef, (doc) => {
+                if (doc.exists()) {
+                    const data = doc.data();
+                    bookedSeats = data.bookedSeats || {};
+                    renderSeats();
+                }
+            }, (error) => {
+                console.error("Error getting booked seats:", error);
+                showError("Failed to load seat data: " + error.message);
+            });
+        }
+
+        // Generate and render seats
+        function renderSeats() {
+            seatGrid.innerHTML = '';
+            selectedSeats = [];
+            updateSelectionInfo();
+            
+            const ride = rides[currentRide];
+            const rows = ride.rows;
+            const cols = ride.cols;
+            
+            // Set grid columns
+            seatGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+            
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const seatId = `${row+1}-${col+1}`;
+                    const seatElement = document.createElement('div');
+                    seatElement.className = 'seat';
+                    seatElement.textContent = seatId;
+                    
+                    // Check if seat is booked
+                    if (bookedSeats[seatId]) {
+                        seatElement.classList.add('booked');
+                        seatElement.title = `Booked by ${bookedSeats[seatId].username}`;
+                    } else {
+                        seatElement.classList.add('available');
+                        
+                        // Add click event for available seats
+                        seatElement.addEventListener('click', () => {
+                            toggleSeatSelection(seatElement, seatId);
+                        });
+                    }
+                    
+                    seatGrid.appendChild(seatElement);
+                }
+            }
+        }
+
+        // Toggle seat selection
+        function toggleSeatSelection(seatElement, seatId) {
+            if (seatElement.classList.contains('booked')) {
+                return;
+            }
+            
+            if (seatElement.classList.contains('selected')) {
+                seatElement.classList.remove('selected');
+                seatElement.classList.add('available');
+                selectedSeats = selectedSeats.filter(id => id !== seatId);
+            } else {
+                seatElement.classList.remove('available');
+                seatElement.classList.add('selected');
+                selectedSeats.push(seatId);
+            }
+            
+            updateSelectionInfo();
+        }
+
+        // Update selection info
+        function updateSelectionInfo() {
+            const ride = rides[currentRide];
+            
+            if (selectedSeats.length === 0) {
+                selectionInfo.textContent = "No seats selected";
+            } else {
+                const totalPrice = selectedSeats.length * ride.price;
+                selectionInfo.textContent = `Selected ${selectedSeats.length} seat(s): ${selectedSeats.join(', ')} - Total: $${totalPrice}`;
+            }
+        }
+
+        // Book selected seats
+        async function bookSelectedSeats() {
+            if (selectedSeats.length === 0) {
+                showError("Please select at least one seat");
+                return;
+            }
+            
+            try {
+                const rideRef = doc(db, "rides", currentRide);
+                const rideDoc = await getDoc(rideRef);
+                
+                if (rideDoc.exists()) {
+                    const data = rideDoc.data();
+                    const updatedBookedSeats = { ...data.bookedSeats };
+                    
+                    // Add new bookings
+                    for (const seatId of selectedSeats) {
+                        updatedBookedSeats[seatId] = {
+                            userId: userId,
+                            username: username,
+                            timestamp: new Date().toISOString()
+                        };
+
+                        // Add to booked_seats collection
+                        const bookedSeatRef = doc(db, "booked_seats", `${currentRide}_${seatId}`);
+                        await setDoc(bookedSeatRef, {
+                            rideId: currentRide,
+                            rideName: rides[currentRide].name,
+                            seatNumber: seatId,
+                            userId: userId,
+                            username: username,
+                            timestamp: new Date().toISOString(),
+                            price: rides[currentRide].price
+                        });
+                    }
+                    
+                    // Update ride statistics
+                    const rideStatsRef = doc(db, "ride_statistics", currentRide);
+                    const rideStatsDoc = await getDoc(rideStatsRef);
+                    
+                    if (rideStatsDoc.exists()) {
+                        await updateDoc(rideStatsRef, {
+                            totalBookings: rideStatsDoc.data().totalBookings + selectedSeats.length,
+                            lastUpdated: new Date().toISOString()
+                        });
+                    } else {
+                        await setDoc(rideStatsRef, {
+                            rideName: rides[currentRide].name,
+                            totalBookings: selectedSeats.length,
+                            lastUpdated: new Date().toISOString()
+                        });
+                    }
+                    
+                    // Update Firestore
+                    await updateDoc(rideRef, {
+                        bookedSeats: updatedBookedSeats
+                    });
+                    
+                    // Also store in user's bookings
+                    const userRef = doc(db, "users", userId);
+                    const userDoc = await getDoc(userRef);
+                    
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        const userBookings = userData.bookings || {};
+                        
+                        if (!userBookings[currentRide]) {
+                            userBookings[currentRide] = [];
+                        }
+                        
+                        userBookings[currentRide] = [
+                            ...userBookings[currentRide],
+                            ...selectedSeats.map(seatId => ({
+                                seatId,
+                                timestamp: new Date().toISOString()
+                            }))
+                        ];
+                        
+                        await updateDoc(userRef, {
+                            bookings: userBookings
+                        });
+                    }
+                    
+                    alert(`Successfully booked seat(s)!`);
+                    selectedSeats = [];
+                    updateSelectionInfo();
+                }
+            } catch (error) {
+                console.error("Error booking seats:", error);
+                showError("Failed to book seats: " + error.message);
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            // Remove any existing error messages
+            const existingErrors = document.querySelectorAll('.error-message');
+            existingErrors.forEach(err => err.remove());
+            
+            // Create and show new error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            document.querySelector('.ride-selection').appendChild(errorDiv);
+            setTimeout(() => errorDiv.remove(), 3000);
+        }
+
+        // Change ride
+        function changeRide() {
+            currentRide = rideSelect.value;
+            const ride = rides[currentRide];
+            
+            rideNameElement.textContent = ride.name;
+            rideDescriptionElement.textContent = ride.description;
+            
+            // Reset selections
+            selectedSeats = [];
+            
+            // Load booked seats and render
+            loadBookedSeats();
+        }
+
+        // Event listeners
+        rideSelect.addEventListener('change', changeRide);
+        bookButton.addEventListener('click', bookSelectedSeats);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkUserLogin();
+            initializeRideData();
+            loadBookedSeats();
+        });
+    </script>
+</body>
+</html>

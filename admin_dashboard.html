@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #e153ce;
+            --primary-dark: #c01eb1;
+            --secondary-color: #3498db;
+            --success-color: #4CAF50;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #f5f7fa;
+            --dark-color: #2c3e50;
+            --gray-color: #95a5a6;
+            --white-color: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .sidebar-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+
+        .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-left: 4px solid white;
+        }
+
+        .menu-item i {
+            margin-right: 10px;
+            font-size: 18px;
+            width: 25px;
+            text-align: center;
+        }
+
+        .menu-item span {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: var(--dark-color);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-weight: 500;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            color: var(--gray-color);
+            font-weight: 500;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .card-icon.rides {
+            background-color: var(--primary-color);
+        }
+
+        .card-icon.users {
+            background-color: var(--secondary-color);
+        }
+
+        .card-icon.bookings {
+            background-color: var(--success-color);
+        }
+
+        .card-icon.revenue {
+            background-color: var(--warning-color);
+        }
+
+        .card-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+
+        .card-change {
+            font-size: 14px;
+            color: var(--success-color);
+        }
+
+        /* Ride List */
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+            font-weight: 600;
+        }
+
+        .ride-list {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .ride-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s ease;
+        }
+
+        .ride-item:last-child {
+            border-bottom: none;
+        }
+
+        .ride-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .ride-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .ride-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+
+        .ride-details h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+
+        .ride-details p {
+            font-size: 14px;
+            color: var(--gray-color);
+        }
+
+        .ride-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        /* Add Ride Form */
+        .add-ride-form {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Joy Ride Hub</h2>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="menu-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1>Admin Dashboard</h1>
+                <div class="user-info">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=e153ce&color=fff" alt="Admin">
+                    <span class="user-name">Admin</span>
+                </div>
+            </div>
+
+            <!-- Dashboard Cards -->
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Active Rides</div>
+                        <div class="card-icon rides">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                    </div>
+                    <div class="card-value">4</div>
+                    <div class="card-change">+1 New ride</div>
+                </div>
+            </div>
+
+            <!-- Ride Management -->
+            <div class="section-title">Ride Management</div>
+            <div class="ride-list">
+                <div id="ride-list-container">
+                    <!-- Rides will be dynamically loaded here -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <!-- Add Firebase SDK before your closing body tag -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCyo_C5-hHmSmvfqbfdp5gA0NhxFAW5p7U",
+            authDomain: "amusmentpark-d93c8.firebaseapp.com",
+            projectId: "amusmentpark-d93c8",
+            storageBucket: "amusmentpark-d93c8.firebasestorage.app",
+            messagingSenderId: "462613440664",
+            appId: "1:462613440664:web:ebd0f80842cb32ca0f08ed",
+            measurementId: "G-QSX4M8RLYF"
+          };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const rtdb = firebase.database();
+
+        // Make rides array available globally
+        let rides = [];
+
+        document.addEventListener("DOMContentLoaded", function () {
+            rides = [
+                { id: 1, name: "Roller Coaster", time: "10:00 AM", description: "Experience the thrill of our signature roller coaster with high-speed turns and loops!" },
+                { id: 2, name: "Ferris Wheel", time: "11:00 AM", description: "Enjoy breathtaking views from our giant Ferris wheel." },
+                { id: 4, name: "Water Slide", time: "01:00 PM", description: "Cool off on our exciting water slides with multiple twists and turns." },
+                { id: 5, name: "Haunted House", time: "02:00 PM", description: "Dare to enter our spooky haunted house filled with surprises." }
+            ];
+            
+            const rideListContainer = document.getElementById("ride-list-container");
+            
+            // Dashboard metrics elements
+            const userCountElement = document.querySelector('.card:nth-child(2) .card-value');
+            const userChangeElement = document.querySelector('.card:nth-child(2) .card-change');
+            const bookingsCountElement = document.querySelector('.card:nth-child(3) .card-value');
+            const bookingsChangeElement = document.querySelector('.card:nth-child(3) .card-change');
+            const revenueCountElement = document.querySelector('.card:nth-child(4) .card-value');
+            const revenueChangeElement = document.querySelector('.card:nth-child(4) .card-change');
+            
+            // Listen for real-time updates to user count
+            db.collection('metrics').doc('users')
+                .onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        userCountElement.textContent = data.count.toLocaleString();
+                        
+                        const percentChange = ((data.count - data.lastMonth) / data.lastMonth * 100).toFixed(1);
+                        const isPositive = percentChange >= 0;
+                        userChangeElement.textContent = `${isPositive ? '+' : ''}${percentChange}% from last month`;
+                        userChangeElement.style.color = isPositive ? 'var(--success-color)' : 'var(--danger-color)';
+                    }
+                }, (error) => {
+                    console.error("Error getting user data:", error);
+                });
+                
+            // Listen for real-time updates to bookings
+            db.collection('metrics').doc('bookings')
+                .onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        bookingsCountElement.textContent = data.today.toLocaleString();
+                        
+                        const percentChange = ((data.today - data.yesterday) / data.yesterday * 100).toFixed(1);
+                        const isPositive = percentChange >= 0;
+                        bookingsChangeElement.textContent = `${isPositive ? '+' : ''}${percentChange}% from yesterday`;
+                        bookingsChangeElement.style.color = isPositive ? 'var(--success-color)' : 'var(--danger-color)';
+                    }
+                }, (error) => {
+                    console.error("Error getting bookings data:", error);
+                });
+                
+            // Listen for real-time updates to revenue
+            db.collection('metrics').doc('revenue')
+                .onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        revenueCountElement.textContent = `$${data.current.toLocaleString()}`;
+                        
+                        const percentChange = ((data.current - data.lastWeek) / data.lastWeek * 100).toFixed(1);
+                        const isPositive = percentChange >= 0;
+                        revenueChangeElement.textContent = `${isPositive ? '+' : ''}${percentChange}% from last week`;
+                        revenueChangeElement.style.color = isPositive ? 'var(--success-color)' : 'var(--danger-color)';
+                    }
+                }, (error) => {
+                    console.error("Error getting revenue data:", error);
+                });
+            
+            // Render rides
+            function renderRides() {
+                rideListContainer.innerHTML = '';
+                
+                rides.forEach(ride => {
+                    let rideItem = document.createElement("div");
+                    rideItem.classList.add("ride-item");
+                    rideItem.innerHTML = `
+                        <div class="ride-info">
+                            <div class="ride-icon">
+                                <i class="fas fa-ticket-alt"></i>
+                            </div>
+                            <div class="ride-details">
+                                <h3>${ride.name}</h3>
+                                <p>${ride.time} - ${ride.description.substring(0, 50)}${ride.description.length > 50 ? '...' : ''}</p>
+                            </div>
+                        </div>
+                        <div class="ride-actions">
+                            <button class="btn btn-secondary" onclick="viewRideDetails(${ride.id})">View</button>
+                        </div>
+                    `;
+                    rideListContainer.appendChild(rideItem);
+                });
+            }
+            
+            // Initialize
+            renderRides();
+            
+            // Remove the entire add ride form handling section
+        });
+        
+        function viewRideDetails(rideId) {
+            const ride = rides.find(r => r.id === rideId);
+            if (!ride) {
+                console.error("Ride not found");
+                return;
+            }
+            
+            localStorage.setItem("selectedRide", JSON.stringify({
+                id: ride.id,
+                name: ride.name,
+                time: ride.time,
+                description: ride.description
+            }));
+            window.location.href = "admin_ride_detail.html";
+        }
+        
+        function editRide(rideId) {
+            // In a real application, this would open an edit form or modal
+            alert(`Edit ride with ID: ${rideId}`);
+        }
+        
+        function deleteRide(rideId) {
+            // In a real application, this would delete the ride after confirmation
+            if (confirm("Are you sure you want to delete this ride?")) {
+                alert(`Ride with ID: ${rideId} would be deleted`);
+                // Here you would remove the ride from the array and re-render
+            }
+        }
+    </script>
+</body>
+</html>
