@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ride Seat Selection</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -126,6 +127,35 @@
             border-left: 4px solid #3498db;
         }
 
+        .ride-rating {
+            margin-top: 10px;
+            color: #f39c12;
+            font-weight: 500;
+        }
+        
+        .ride-rating i {
+            color: #f39c12;
+            margin-right: 5px;
+        }
+        
+        .ride-requirements {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .ride-requirements p {
+            margin: 5px 0;
+            color: #2c3e50;
+        }
+        
+        .ride-requirements i {
+            color: #e74c3c;
+            margin-right: 5px;
+        }
+
         button {
             width: 100%;
             padding: 12px;
@@ -186,6 +216,115 @@
             font-weight: bold;
             color: #2c3e50;
         }
+        
+        .group-booking-options {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #9b59b6;
+        }
+        
+        .group-booking-options h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .group-booking-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .group-size-selector {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .group-booking-info {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 10px;
+        }
+        
+        .group-booking-info i {
+            color: #9b59b6;
+            margin-right: 5px;
+        }
+        
+        .secondary-button {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .secondary-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.3);
+        }
+        
+        .ticket-options {
+            margin: 20px 0;
+        }
+        
+        .ticket-options h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        .ticket-types {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .ticket-type {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .ticket-type input[type="radio"] {
+            display: none;
+        }
+        
+        .ticket-type label {
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .ticket-type input[type="radio"]:checked + label {
+            background-color: rgba(52, 152, 219, 0.1);
+            border-left: 4px solid #3498db;
+        }
+        
+        .ticket-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        
+        .ticket-price {
+            color: #e74c3c;
+            font-weight: 500;
+            margin: 5px 0;
+        }
+        
+        .ticket-description {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
     </style>
 </head>
 <body>
@@ -212,6 +351,15 @@
                 <div class="ride-info">
                     <h2 id="ride-name">Roller Coaster</h2>
                     <p id="ride-description">Experience the thrill of our signature roller coaster with high-speed turns and loops!</p>
+                    <div class="ride-rating">
+                        <i class="fas fa-star"></i>
+                        <span id="rating-value">4.5</span>
+                        (<span id="review-count">24</span> reviews)
+                    </div>
+                    <div class="ride-requirements">
+                        <p><i class="fas fa-ruler-vertical"></i> <span id="height-requirement">Minimum height: 48 inches</span></p>
+                        <p><i class="fas fa-birthday-cake"></i> <span id="age-requirement">Minimum age: 10 years</span></p>
+                    </div>
                 </div>
 
                 <div class="legend">
@@ -237,7 +385,35 @@
                     No seats selected
                 </div>
 
-                <button id="book-button">Book Selected Seats</button>
+                <div class="group-booking-options">
+                    <h3>Group Booking Options</h3>
+                    <div class="group-booking-controls">
+                        <div class="group-size-selector">
+                            <label for="group-size">Number of people:</label>
+                            <select id="group-size">
+                                <option value="1">1 person</option>
+                                <option value="2">2 people</option>
+                                <option value="3">3 people</option>
+                                <option value="4">4 people</option>
+                                <option value="5">5 people</option>
+                                <option value="6">6 people</option>
+                            </select>
+                        </div>
+                        <button id="select-adjacent-seats" class="secondary-button">Find Adjacent Seats</button>
+                    </div>
+                    <p class="group-booking-info">
+                        <i class="fas fa-info-circle"></i> Select adjacent seats for your group or use the "Find Adjacent Seats" button to automatically find available seats together.
+                    </p>
+                </div>
+
+                <!-- Ticket options section removed -->
+
+                </div>
+
+                <button id="book-button">Proceed to Payment</button>
+                <a href="ride_reviews.html" class="review-button">
+                    <i class="fas fa-star"></i> View & Write Reviews
+                </a>
             </div>
         </main>
     </div>
@@ -272,28 +448,36 @@
                 description: "Experience the thrill of our signature roller coaster with high-speed turns and loops!",
                 rows: 5,
                 cols: 8,
-                price: 10
+                price: 10,
+                minHeight: "48 inches",
+                minAge: "10 years"
             },
             "ferris-wheel": {
                 name: "Ferris Wheel",
                 description: "Enjoy breathtaking views from our giant Ferris wheel.",
                 rows: 6,
                 cols: 6,
-                price: 8
+                price: 8,
+                minHeight: "42 inches",
+                minAge: "6 years"
             },
             "water-slide": {
                 name: "Water Slide",
                 description: "Cool off on our exciting water slides with multiple twists and turns.",
                 rows: 4,
                 cols: 8,
-                price: 12
+                price: 12,
+                minHeight: "48 inches",
+                minAge: "8 years"
             },
             "haunted-house": {
                 name: "Haunted House",
                 description: "Dare to enter our spooky haunted house filled with surprises.",
                 rows: 5,
                 cols: 7,
-                price: 15
+                price: 15,
+                minHeight: "None",
+                minAge: "12 years"
             }
         };
 
@@ -435,7 +619,10 @@
             if (selectedSeats.length === 0) {
                 selectionInfo.textContent = "No seats selected";
             } else {
-                const totalPrice = selectedSeats.length * ride.price;
+                // Since ticket types were removed, use base price only
+                const basePrice = ride.price;
+                const totalPrice = selectedSeats.length * basePrice;
+                
                 selectionInfo.textContent = `Selected ${selectedSeats.length} seat(s): ${selectedSeats.join(', ')} - Total: $${totalPrice}`;
             }
         }
@@ -448,88 +635,30 @@
             }
             
             try {
-                const rideRef = doc(db, "rides", currentRide);
-                const rideDoc = await getDoc(rideRef);
+                // Since ticket types were removed, use base price only
+                const basePrice = rides[currentRide].price;
+                const totalPrice = selectedSeats.length * basePrice;
                 
-                if (rideDoc.exists()) {
-                    const data = rideDoc.data();
-                    const updatedBookedSeats = { ...data.bookedSeats };
-                    
-                    // Add new bookings
-                    for (const seatId of selectedSeats) {
-                        updatedBookedSeats[seatId] = {
-                            userId: userId,
-                            username: username,
-                            timestamp: new Date().toISOString()
-                        };
-
-                        // Add to booked_seats collection
-                        const bookedSeatRef = doc(db, "booked_seats", `${currentRide}_${seatId}`);
-                        await setDoc(bookedSeatRef, {
-                            rideId: currentRide,
-                            rideName: rides[currentRide].name,
-                            seatNumber: seatId,
-                            userId: userId,
-                            username: username,
-                            timestamp: new Date().toISOString(),
-                            price: rides[currentRide].price
-                        });
-                    }
-                    
-                    // Update ride statistics
-                    const rideStatsRef = doc(db, "ride_statistics", currentRide);
-                    const rideStatsDoc = await getDoc(rideStatsRef);
-                    
-                    if (rideStatsDoc.exists()) {
-                        await updateDoc(rideStatsRef, {
-                            totalBookings: rideStatsDoc.data().totalBookings + selectedSeats.length,
-                            lastUpdated: new Date().toISOString()
-                        });
-                    } else {
-                        await setDoc(rideStatsRef, {
-                            rideName: rides[currentRide].name,
-                            totalBookings: selectedSeats.length,
-                            lastUpdated: new Date().toISOString()
-                        });
-                    }
-                    
-                    // Update Firestore
-                    await updateDoc(rideRef, {
-                        bookedSeats: updatedBookedSeats
-                    });
-                    
-                    // Also store in user's bookings
-                    const userRef = doc(db, "users", userId);
-                    const userDoc = await getDoc(userRef);
-                    
-                    if (userDoc.exists()) {
-                        const userData = userDoc.data();
-                        const userBookings = userData.bookings || {};
-                        
-                        if (!userBookings[currentRide]) {
-                            userBookings[currentRide] = [];
-                        }
-                        
-                        userBookings[currentRide] = [
-                            ...userBookings[currentRide],
-                            ...selectedSeats.map(seatId => ({
-                                seatId,
-                                timestamp: new Date().toISOString()
-                            }))
-                        ];
-                        
-                        await updateDoc(userRef, {
-                            bookings: userBookings
-                        });
-                    }
-                    
-                    alert(`Successfully booked seat(s)!`);
-                    selectedSeats = [];
-                    updateSelectionInfo();
-                }
+                // Store booking information in localStorage
+                const bookingInfo = {
+                    rideId: currentRide,
+                    rideName: rides[currentRide].name,
+                    selectedSeats: selectedSeats,
+                    ticketType: "standard", // Default to standard since options were removed
+                    basePrice: basePrice,
+                    priceModifier: 0,
+                    totalPrice: totalPrice,
+                    userId: userId,
+                    username: username
+                };
+                
+                localStorage.setItem('pendingBooking', JSON.stringify(bookingInfo));
+                
+                // Redirect to payment page
+                window.location.href = "payment_gateway.html";
             } catch (error) {
-                console.error("Error booking seats:", error);
-                showError("Failed to book seats: " + error.message);
+                console.error("Error preparing booking:", error);
+                showError("Failed to process booking: " + error.message);
             }
         }
 
@@ -547,24 +676,158 @@
             setTimeout(() => errorDiv.remove(), 3000);
         }
 
-        // Change ride
-        function changeRide() {
+        
+        const ratingValueElement = document.getElementById('rating-value');
+        const reviewCountElement = document.getElementById('review-count');
+        
+
+        async function changeRide() {
             currentRide = rideSelect.value;
             const ride = rides[currentRide];
             
             rideNameElement.textContent = ride.name;
             rideDescriptionElement.textContent = ride.description;
             
-            // Reset selections
-            selectedSeats = [];
+            // Update height and age requirements
+            document.getElementById('height-requirement').textContent = `Minimum height: ${ride.minHeight}`;
+            document.getElementById('age-requirement').textContent = `Minimum age: ${ride.minAge}`;
             
-            // Load booked seats and render
-            loadBookedSeats();
+            // Load ride rating data
+            const rideRef = doc(db, "rides", currentRide);
+            const rideDoc = await getDoc(rideRef);
+            
+            if (rideDoc.exists()) {
+                const data = rideDoc.data();
+                const rating = data.averageRating || 0;
+                const reviewCount = data.reviewCount || 0;
+                
+                ratingValueElement.textContent = rating.toFixed(1);
+                reviewCountElement.textContent = reviewCount;
+            } else {
+                ratingValueElement.textContent = "0.0";
+                reviewCountElement.textContent = "0";
+            }
+            
+            // Clear selected seats
+            selectedSeats = [];
+            updateSelectionInfo();
+            
+            // Load booked seats
+            unsubscribeFromBookings = loadBookedSeats();
         }
 
         // Event listeners
         rideSelect.addEventListener('change', changeRide);
         bookButton.addEventListener('click', bookSelectedSeats);
+        
+        // Add event listeners for ticket type selection
+        document.querySelectorAll('input[name="ticket-type"]').forEach(radio => {
+            radio.addEventListener('change', updateSelectionInfo);
+        });
+        
+        // Add event listener for group booking
+        document.getElementById('select-adjacent-seats').addEventListener('click', findAdjacentSeats);
+        
+        // Find adjacent seats for group booking
+        function findAdjacentSeats() {
+            const groupSize = parseInt(document.getElementById('group-size').value);
+            const ride = rides[currentRide];
+            const rows = ride.rows;
+            const cols = ride.cols;
+            
+            // Clear any previously selected seats
+            selectedSeats = [];
+            renderSeats(); // Re-render to clear selections
+            
+            // Try to find adjacent seats in rows
+            let found = false;
+            
+            // First try: find seats in the same row
+            for (let row = 0; row < rows && !found; row++) {
+                let consecutiveSeats = [];
+                
+                for (let col = 0; col < cols; col++) {
+                    const seatId = `${row+1}-${col+1}`;
+                    
+                    if (!bookedSeats[seatId]) {
+                        consecutiveSeats.push(seatId);
+                        
+                        if (consecutiveSeats.length === groupSize) {
+                            selectedSeats = [...consecutiveSeats];
+                            found = true;
+                            break;
+                        }
+                    } else {
+                        consecutiveSeats = [];
+                    }
+                }
+            }
+            
+            // Second try: find seats in adjacent rows if not found in same row
+            if (!found) {
+                // Try to find seats in adjacent rows (2x2, 2x3, 3x2 patterns depending on group size)
+                if (groupSize >= 4 && groupSize <= 6) {
+                    const patterns = [];
+                    
+                    if (groupSize === 4) patterns.push([2, 2]);
+                    if (groupSize === 5) patterns.push([2, 3], [3, 2]);
+                    if (groupSize === 6) patterns.push([2, 3], [3, 2], [3, 3]);
+                    
+                    for (const pattern of patterns) {
+                        if (found) break;
+                        
+                        const rows = pattern[0];
+                        const cols = pattern[1];
+                        
+                        for (let startRow = 0; startRow <= ride.rows - rows; startRow++) {
+                            if (found) break;
+                            
+                            for (let startCol = 0; startCol <= ride.cols - cols; startCol++) {
+                                let validBlock = true;
+                                let blockSeats = [];
+                                
+                                for (let r = 0; r < rows; r++) {
+                                    for (let c = 0; c < cols; c++) {
+                                        const seatId = `${startRow+r+1}-${startCol+c+1}`;
+                                        
+                                        if (bookedSeats[seatId]) {
+                                            validBlock = false;
+                                            break;
+                                        }
+                                        
+                                        blockSeats.push(seatId);
+                                    }
+                                    
+                                    if (!validBlock) break;
+                                }
+                                
+                                if (validBlock && blockSeats.length === groupSize) {
+                                    selectedSeats = blockSeats;
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (!found) {
+                showError(`Could not find ${groupSize} adjacent seats. Please select seats manually.`);
+            } else {
+                // Update the UI to show selected seats
+                const seatElements = document.querySelectorAll('.seat');
+                seatElements.forEach(element => {
+                    const seatId = element.textContent;
+                    if (selectedSeats.includes(seatId)) {
+                        element.classList.remove('available');
+                        element.classList.add('selected');
+                    }
+                });
+                
+                updateSelectionInfo();
+            }
+        }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {

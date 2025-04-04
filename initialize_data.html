@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Initialize Data Structure</title>
+</head>
+<body>
+    <h2>Initializing Data Structure...</h2>
+    <div id="status"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, collection, Timestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCyo_C5-hHmSmvfqbfdp5gA0NhxFAW5p7U",
+            authDomain: "amusmentpark-d93c8.firebaseapp.com",
+            projectId: "amusmentpark-d93c8",
+            storageBucket: "amusmentpark-d93c8.appspot.com",
+            messagingSenderId: "462613440664",
+            appId: "1:462613440664:web:ebd0f80842cb32ca0f08ed",
+            measurementId: "G-QSX4M8RLYF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const rides = [
+            {
+                id: "roller-coaster",
+                name: "Roller Coaster",
+                description: "Experience the thrill of our signature roller coaster with high-speed turns and loops!",
+                capacity: 30,
+                price: 25,
+                status: "active"
+            },
+            {
+                id: "ferris-wheel",
+                name: "Ferris Wheel",
+                description: "Enjoy breathtaking views from our giant Ferris wheel.",
+                capacity: 40,
+                price: 15,
+                status: "active"
+            },
+            {
+                id: "water-slide",
+                name: "Water Slide",
+                description: "Cool off on our exciting water slides with multiple twists and turns.",
+                capacity: 25,
+                price: 18,
+                status: "active"
+            },
+            {
+                id: "haunted-house",
+                name: "Haunted House",
+                description: "Dare to enter our spooky haunted house filled with surprises.",
+                capacity: 15,
+                price: 22,
+                status: "active"
+            }
+        ];
+
+        // Sample booking for testing
+        const sampleBooking = {
+            rideId: "roller-coaster",
+            userName: "John Doe",
+            seats: ["A1", "A2"],
+            timestamp: Timestamp.now(),
+            price: 50,
+            bookingDate: Timestamp.now()
+        };
+
+        async function initializeData() {
+            const status = document.getElementById('status');
+            try {
+                // Initialize rides
+                for (const ride of rides) {
+                    await setDoc(doc(db, 'rides', ride.id), ride);
+                    status.innerHTML += `<p>Added ride: ${ride.name}</p>`;
+                }
+
+                // Add sample booking
+                const bookingRef = doc(collection(db, 'bookings'));
+                await setDoc(bookingRef, sampleBooking);
+                status.innerHTML += '<p>Added sample booking</p>';
+
+                status.innerHTML += '<p style="color: green;">Data structure initialized successfully!</p>';
+            } catch (error) {
+                status.innerHTML += `<p style="color: red;">Error: ${error.message}</p>`;
+                console.error("Error initializing data:", error);
+            }
+        }
+
+        // Run initialization
+        initializeData();
+    </script>
+</body>
+</html>

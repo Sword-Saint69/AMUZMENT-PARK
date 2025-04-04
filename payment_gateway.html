@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Gateway - Joy Ride Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background: linear-gradient(135deg, #e153ce 0%, #391a3a 100%);
+            color: white;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .payment-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            width: 800px;
+            max-width: 90%;
+            margin: 50px auto;
+        }
+
+        .payment-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .payment-header h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .payment-summary {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .summary-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .summary-label {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .summary-value {
+            color: #7f8c8d;
+        }
+
+        .payment-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+
+        .payment-methods {
+            margin-bottom: 30px;
+        }
+
+        .payment-methods h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .payment-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .payment-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #7f8c8d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .payment-tab.active {
+            color: #3498db;
+            border-bottom: 3px solid #3498db;
+        }
+
+        .payment-content {
+            display: none;
+        }
+
+        .payment-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s ease;
+        }
+
+        .form-group input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .payment-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .payment-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .payment-button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .payment-logo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .payment-logo img {
+            height: 40px;
+        }
+
+        .payment-info {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+
+        .card-icons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 30px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .card-icon.visa {
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png');
+        }
+
+        .card-icon.mastercard {
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png');
+        }
+
+        .card-icon.amex {
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/American_Express_logo_%282018%29.svg/1200px-American_Express_logo_%282018%29.svg.png');
+        }
+
+        .card-icon.discover {
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Discover_Card_logo.svg/1280px-Discover_Card_logo.svg.png');
+        }
+
+        .error-message {
+            background: #fff3f3;
+            color: #e74c3c;
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+            margin-top: 10px;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .success-message {
+            background: #eafaf1;
+            color: #27ae60;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #27ae60;
+            margin: 20px 0;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 20px;
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .back-button:hover {
+            color: #2980b9;
+        }
+
+        .back-button i {
+            margin-right: 5px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Joy Ride Hub</h1>
+        </header>
+        <main>
+            <div class="payment-container">
+                <div class="payment-header">
+                    <h2>Complete Your Payment</h2>
+                    <p>Secure payment processing for your ride tickets</p>
+                </div>
+
+                <div class="payment-summary">
+                    <h3>Order Summary</h3>
+                    <div class="summary-item">
+                        <span class="summary-label">Ride:</span>
+                        <span class="summary-value" id="ride-name">Loading...</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Seats:</span>
+                        <span class="summary-value" id="seats">Loading...</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Ticket Type:</span>
+                        <span class="summary-value" id="ticket-type">Loading...</span>
+                    </div>
+                    <div class="payment-total">
+                        <span>Total:</span>
+                        <span id="total-price">$0.00</span>
+                    </div>
+                </div>
+
+                <div class="payment-methods">
+                    <h3>Select Payment Method</h3>
+                    <div class="payment-tabs">
+                        <div class="payment-tab active" data-tab="credit-card">Credit Card</div>
+                        <div class="payment-tab" data-tab="paypal">PayPal</div>
+                        <div class="payment-tab" data-tab="apple-pay">Apple Pay</div>
+                        <div class="payment-tab" data-tab="google-pay">Google Pay</div>
+                        <div class="payment-tab" data-tab="qr-code">QR Code</div>
+                    </div>
+
+                    <div class="payment-content active" id="credit-card-content">
+                        <div class="card-icons">
+                            <div class="card-icon visa"></div>
+                            <div class="card-icon mastercard"></div>
+                            <div class="card-icon amex"></div>
+                            <div class="card-icon discover"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="card-number">Card Number</label>
+                            <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expiry-date">Expiry Date</label>
+                                <input type="text" id="expiry-date" placeholder="MM/YY" maxlength="5">
+                            </div>
+                            <div class="form-group">
+                                <label for="cvv">CVV</label>
+                                <input type="text" id="cvv" placeholder="123" maxlength="3">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="card-name">Cardholder Name</label>
+                            <input type="text" id="card-name" placeholder="John Doe">
+                        </div>
+                    </div>
+
+                    <div class="payment-content" id="paypal-content">
+                        <div class="payment-logo">
+                            <img src="https://www.paypalobjects.com/webstatic/en_US/i/buttons/PP_logo_h_100x26.png" alt="PayPal">
+                        </div>
+                        <div class="payment-info">
+                            <p>You will be redirected to PayPal to complete your payment securely.</p>
+                        </div>
+                    </div>
+
+                    <div class="payment-content" id="apple-pay-content">
+                        <div class="payment-logo">
+                            <img src="https://developer.apple.com/design/human-interface-guidelines/technologies/apple-pay/images/apple-pay-mark_2x.png" alt="Apple Pay" style="height: 30px;">
+                        </div>
+                        <div class="payment-info">
+                            <p>Pay securely using Apple Pay.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="loading" class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Processing your payment...</p>
+                </div>
+
+                <div id="success-message" class="success-message" style="display: none;">
+                    <i class="fas fa-check-circle"></i> Payment successful! Your seats have been booked.
+                    <div style="margin-top: 15px;">
+                        <a href="user_dashboard.html" class="payment-button">Go to My Bookings</a>
+                    </div>
+                </div>
+
+                <button id="pay-button" class="payment-button">Complete Payment</button>
+                <a href="ride_selection.html" class="back-button"><i class="fas fa-arrow-left"></i> Back to Seat Selection</a>
+            </div>
+        </main>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCyo_C5-hHmSmvfqbfdp5gA0NhxFAW5p7U",
+            authDomain: "amusmentpark-d93c8.firebaseapp.com",
+            projectId: "amusmentpark-d93c8",
+            storageBucket: "amusmentpark-d93c8.firebasestorage.app",
+            messagingSenderId: "462613440664",
+            appId: "1:462613440664:web:ebd0f80842cb32ca0f08ed",
+            measurementId: "G-QSX4M8RLYF"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // DOM Elements
+        const rideNameElement = document.getElementById('ride-name');
+        const seatsElement = document.getElementById('seats');
+        const ticketTypeElement = document.getElementById('ticket-type');
+        const totalPriceElement = document.getElementById('total-price');
+        const payButton = document.getElementById('pay-button');
+        const loadingElement = document.getElementById('loading');
+        const successMessageElement = document.getElementById('success-message');
+
+        // Payment tabs
+        const paymentTabs = document.querySelectorAll('.payment-tab');
+        const paymentContents = document.querySelectorAll('.payment-content');
+
+        // User data
+        let userId = null;
+        let username = null;
+        let bookingInfo = null;
+
+        // Check if user is logged in and get booking info
+        function initialize() {
+            // Get user data from localStorage
+            userId = localStorage.getItem("userId");
+            username = localStorage.getItem("username");
+
+            if (!userId) {
+                // Redirect to login page if not logged in
+                window.location.href = "user_login.html";
+                return;
+            }
+
+            // Get booking info from localStorage
+            const bookingInfoStr = localStorage.getItem('pendingBooking');
+            if (!bookingInfoStr) {
+                // No booking info, redirect back to ride selection
+                window.location.href = "ride_selection.html";
+                return;
+            }
+
+            bookingInfo = JSON.parse(bookingInfoStr);
+            
+            // Update summary
+            rideNameElement.textContent = bookingInfo.rideName;
+            seatsElement.textContent = bookingInfo.selectedSeats.join(', ');
+            ticketTypeElement.textContent = `${bookingInfo.ticketType.toUpperCase()} (+$${bookingInfo.priceModifier} per seat)`;
+            totalPriceElement.textContent = `$${bookingInfo.totalPrice.toFixed(2)}`;
+        }
+
+        // Format credit card number with spaces
+        document.getElementById('card-number').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = '';
+            
+            for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) {
+                    formattedValue += ' ';
+                }
+                formattedValue += value[i];
+            }
+            
+            e.target.value = formattedValue;
+        });
+        
+        // Format expiry date
+        document.getElementById('expiry-date').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+            
+            if (value.length > 2) {
+                e.target.value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            } else {
+                e.target.value = value;
+            }
+        });
+
+        // Show error message
+        function showError(message) {
+            // Remove any existing error messages
+            const existingErrors = document.querySelectorAll('.error-message');
+            existingErrors.forEach(err => err.remove());
+            
+            // Create and show new error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            document.querySelector('.payment-container').appendChild(errorDiv);
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+
+        // Handle payment tab switching
+        paymentTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and contents
+                paymentTabs.forEach(t => t.classList.remove('active'));
+                paymentContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                
+                // Show corresponding content
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-content`).classList.add('active');
+            });
+        });
+
+        // Process payment
+        async function processPayment() {
+            const activeTab = document.querySelector('.payment-tab.active').getAttribute('data-tab');
+            
+            // Validate payment information based on method
+            if (activeTab === 'credit-card') {
+                const cardNumber = document.getElementById('card-number').value;
+                const expiryDate = document.getElementById('expiry-date').value;
+                const cvv = document.getElementById('cvv').value;
+                const cardName = document.getElementById('card-name').value;
+                
+                if (!cardNumber || !expiryDate || !cvv || !cardName) {
+                    showError("Please fill in all card details");
+                    return;
+                }
+                
+                // Simple validation
+                if (cardNumber.replace(/\s/g, '').length !== 16) {
+                    showError("Invalid card number");
+                    return;
+                }
+                
+                if (!expiryDate.match(/^\d{2}\/\d{2}$/)) {
+                    showError("Invalid expiry date (use MM/YY format)");
+                    return;
+                }
+                
+                if (cvv.length !== 3) {
+                    showError("Invalid CVV");
+                    return;
+                }
+            }
+            
+            // Show loading state
+            payButton.style.display = 'none';
+            loadingElement.style.display = 'block';
+            
+            try {
+                // Simulate payment processing
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Complete the booking in Firestore
+                await completeBooking();
+                
+                // Show success message
+                loadingElement.style.display = 'none';
+                successMessageElement.style.display = 'block';
+                
+                // Clear the pending booking from localStorage
+                localStorage.removeItem('pendingBooking');
+                
+            } catch (error) {
+                console.error("Payment error:", error);
+                showError("Payment failed: " + error.message);
+                
+                // Reset button
+                payButton.style.display = 'block';
+                loadingElement.style.display = 'none';
+            }
+        }
+
+        // Complete booking after successful payment
+        async function completeBooking() {
+            try {
+                const rideRef = doc(db, "rides", bookingInfo.rideId);
+                const rideDoc = await getDoc(rideRef);
+                
+                if (rideDoc.exists()) {
+                    const data = rideDoc.data();
+                    const updatedBookedSeats = { ...data.bookedSeats };
+                    
+                    // Add new bookings
+                    for (const seatId of bookingInfo.selectedSeats) {
+                        updatedBookedSeats[seatId] = {
+                            userId: userId,
+                            username: username,
+                            timestamp: new Date().toISOString()
+                        };
+
+                        // Add to booked_seats collection
+                        const bookedSeatRef = doc(db, "booked_seats", `${bookingInfo.rideId}_${seatId}`);
+                        await setDoc(bookedSeatRef, {
+                            rideId: bookingInfo.rideId,
+                            rideName: bookingInfo.rideName,
+                            seatNumber: seatId,
+                            userId: userId,
+                            username: username,
+                            timestamp: new Date().toISOString(),
+                            price: bookingInfo.basePrice,
+                            ticketType: bookingInfo.ticketType
+                        });
+                    }
+                    
+                    // Update ride statistics
+                    const rideStatsRef = doc(db, "ride_statistics", bookingInfo.rideId);
+                    const rideStatsDoc = await getDoc(rideStatsRef);
+                    
+                    if (rideStatsDoc.exists()) {
+                        await updateDoc(rideStatsRef, {
+                            totalBookings: rideStatsDoc.data().totalBookings + bookingInfo.selectedSeats.length,
+                            lastUpdated: new Date().toISOString()
+                        });
+                    } else {
+                        await setDoc(rideStatsRef, {
+                            rideName: bookingInfo.rideName,
+                            totalBookings: bookingInfo.selectedSeats.length,
+                            lastUpdated: new Date().toISOString()
+                        });
+                    }
+                    
+                    // Update Firestore
+                    await updateDoc(rideRef, {
+                        bookedSeats: updatedBookedSeats
+                    });
+                    
+                    // Also store in user's bookings
+                    const userRef = doc(db, "users", userId);
+                    const userDoc = await getDoc(userRef);
+                    
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        const userBookings = userData.bookings || {};
+                        
+                        if (!userBookings[bookingInfo.rideId]) {
+                            userBookings[bookingInfo.rideId] = [];
+                        }
+                        
+                        userBookings[bookingInfo.rideId] = [
+                            ...userBookings[bookingInfo.rideId],
+                            ...bookingInfo.selectedSeats.map(seatId => ({
+                                seatId,
+                                timestamp: new Date().toISOString(),
+                                ticketType: bookingInfo.ticketType
+                            }))
+                        ];
+                        
+                        await updateDoc(userRef, {
+                            bookings: userBookings
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("Error completing booking:", error);
+                throw new Error("Failed to complete booking: " + error.message);
+            }
+        }
+
+        // Event listeners
+        payButton.addEventListener('click', processPayment);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', initialize);
+    </script>
+</body>
+</html>

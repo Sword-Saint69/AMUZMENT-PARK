@@ -118,6 +118,88 @@
             margin-bottom: 15px;
             color: #bdc3c7;
         }
+        .cancel-button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: auto;
+            transition: background-color 0.3s;
+        }
+        .cancel-button:hover {
+            background-color: #c0392b;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .modal-header h3 {
+            margin: 0;
+            color: #e74c3c;
+        }
+        .close-modal {
+            font-size: 22px;
+            color: #7f8c8d;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-cancel {
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+        }
+        .btn-confirm {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .success-message {
+            background-color: #2ecc71;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -139,9 +221,31 @@
         </div>
     </div>
     
+    <!-- Cancellation Confirmation Modal -->
+    <div id="cancelModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Cancel Booking</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel this booking?</p>
+                <p id="booking-details">Ride: <span id="modal-ride-name"></span> - Seat: <span id="modal-seat-number"></span></p>
+                <p>This action cannot be undone.</p>
+            </div>
+            <div id="success-message" class="success-message">
+                <i class="fas fa-check-circle"></i> Booking successfully cancelled!
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-cancel" id="close-modal-btn">No, Keep It</button>
+                <button class="btn btn-confirm" id="confirm-cancel-btn">Yes, Cancel Booking</button>
+            </div>
+        </div>
+    </div>
+    
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, getDocs, doc, getDoc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCyo_C5-hHmSmvfqbfdp5gA0NhxFAW5p7U",
@@ -155,6 +259,19 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
+        // Modal elements
+        const modal = document.getElementById("cancelModal");
+        const closeModalBtn = document.querySelector(".close-modal");
+        const closeModalBtnAlt = document.getElementById("close-modal-btn");
+        const confirmCancelBtn = document.getElementById("confirm-cancel-btn");
+        const modalRideName = document.getElementById("modal-ride-name");
+        const modalSeatNumber = document.getElementById("modal-seat-number");
+        const successMessage = document.getElementById("success-message");
+        
+        // Current booking being cancelled
+        let currentBookingId = null;
+        let currentBookingData = null;
 
         document.addEventListener("DOMContentLoaded", async function() {
             const rideTitle = document.getElementById("ride-title");
@@ -183,7 +300,10 @@
                 
                 seatsSnapshot.forEach((doc) => {
                     const bookingData = doc.data();
-                    bookings.push(bookingData);
+                    bookings.push({
+                        id: doc.id,
+                        ...bookingData
+                    });
                     totalRevenue += bookingData.price || 0;
                 });
 
@@ -232,10 +352,37 @@
                                         <h4>${booking.rideName || 'Unknown Ride'} - Seat ${booking.seatNumber}</h4>
                                         <p><strong>Booked by:</strong> ${booking.username || 'Anonymous'}</p>
                                         <p><strong>Price:</strong> $${booking.price || 0}</p>
+                                        <p><strong>Ticket Type:</strong> ${booking.ticketType || 'Standard'}</p>
+                                        <p><strong>Booked on:</strong> ${new Date(booking.timestamp).toLocaleString()}</p>
                                     </div>
+                                    <button class="cancel-button" data-booking-id="${booking.id}" data-ride-name="${booking.rideName}" data-seat-number="${booking.seatNumber}" data-user-id="${booking.userId}">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </button>
                                 </div>
                             `).join('')}
                     </div>`;
+                
+                // Add event listeners to cancel buttons
+                document.querySelectorAll('.cancel-button').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const bookingId = this.getAttribute('data-booking-id');
+                        const rideName = this.getAttribute('data-ride-name');
+                        const seatNumber = this.getAttribute('data-seat-number');
+                        const userId = this.getAttribute('data-user-id');
+                        
+                        // Set current booking data
+                        currentBookingId = bookingId;
+                        currentBookingData = bookings.find(b => b.id === bookingId);
+                        
+                        // Update modal content
+                        modalRideName.textContent = rideName;
+                        modalSeatNumber.textContent = seatNumber;
+                        
+                        // Show modal
+                        modal.style.display = "flex";
+                    });
+                });
+                
             } catch (error) {
                 console.error("Error loading bookings:", error);
                 bookingList.innerHTML = `
@@ -243,6 +390,100 @@
                         <i class="fas fa-exclamation-triangle"></i>
                         <p>Failed to load bookings</p>
                     </div>`;
+            }
+        });
+        
+        // Close modal when clicking the close button
+        closeModalBtn.addEventListener("click", function() {
+            modal.style.display = "none";
+            successMessage.style.display = "none";
+        });
+        
+        // Close modal when clicking the "No, Keep It" button
+        closeModalBtnAlt.addEventListener("click", function() {
+            modal.style.display = "none";
+            successMessage.style.display = "none";
+        });
+        
+        // Close modal when clicking outside the modal content
+        window.addEventListener("click", function(event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+                successMessage.style.display = "none";
+            }
+        });
+        
+        // Handle booking cancellation
+        confirmCancelBtn.addEventListener("click", async function() {
+            if (!currentBookingId || !currentBookingData) return;
+            
+            try {
+                // Disable the button during processing
+                confirmCancelBtn.disabled = true;
+                confirmCancelBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                
+                // 1. Delete the booking from booked_seats collection
+                await deleteDoc(doc(db, "booked_seats", currentBookingId));
+                
+                // 2. Update the ride's bookedSeats object
+                if (currentBookingData.rideId) {
+                    const rideRef = doc(db, "rides", currentBookingData.rideId);
+                    const rideDoc = await getDoc(rideRef);
+                    
+                    if (rideDoc.exists()) {
+                        const rideData = rideDoc.data();
+                        const bookedSeats = { ...rideData.bookedSeats };
+                        
+                        // Remove the seat booking
+                        if (bookedSeats[currentBookingData.seatNumber]) {
+                            delete bookedSeats[currentBookingData.seatNumber];
+                            await updateDoc(rideRef, { bookedSeats });
+                        }
+                    }
+                }
+                
+                // 3. Update the user's bookings
+                if (currentBookingData.userId) {
+                    const userRef = doc(db, "users", currentBookingData.userId);
+                    const userDoc = await getDoc(userRef);
+                    
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        const userBookings = { ...userData.bookings };
+                        
+                        // Remove the booking from user's bookings
+                        if (userBookings[currentBookingData.rideId]) {
+                            userBookings[currentBookingData.rideId] = userBookings[currentBookingData.rideId].filter(
+                                booking => booking.seatId !== currentBookingData.seatNumber
+                            );
+                            
+                            // If no more bookings for this ride, remove the ride entry
+                            if (userBookings[currentBookingData.rideId].length === 0) {
+                                delete userBookings[currentBookingData.rideId];
+                            }
+                            
+                            await updateDoc(userRef, { bookings: userBookings });
+                        }
+                    }
+                }
+                
+                // Show success message
+                successMessage.style.display = "block";
+                confirmCancelBtn.style.display = "none";
+                closeModalBtnAlt.textContent = "Close";
+                
+                // Reload the page after 2 seconds
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+                
+            } catch (error) {
+                console.error("Error cancelling booking:", error);
+                alert("Failed to cancel booking: " + error.message);
+                
+                // Reset button
+                confirmCancelBtn.disabled = false;
+                confirmCancelBtn.innerHTML = 'Yes, Cancel Booking';
             }
         });
     </script>

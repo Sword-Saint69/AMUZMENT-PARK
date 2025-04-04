@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride Reviews - Joy Ride Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #FF69B4;
+            --primary-dark: #FF1493;
+            --primary-light: rgba(255, 105, 180, 0.1);
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+            --animation-timing: 0.3s;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #FAF3E0 0%, #FFE4E1 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            animation: gradientBG 15s ease infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header h1 {
+            position: relative;
+            z-index: 1;
+            animation: slideInFromTop 1s ease;
+        }
+
+        @keyframes slideInFromTop {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        main {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .user-info {
+            background: rgba(44, 62, 80, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .user-info span {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .reviews-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .ride-selector {
+            margin-bottom: 20px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .rating-form {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .star-rating i {
+            font-size: 30px;
+            color: #ddd;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: color 0.3s ease;
+        }
+
+        .star-rating i.active {
+            color: #FFD700;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            margin-bottom: 15px;
+            resize: vertical;
+            min-height: 100px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--animation-timing) ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3);
+        }
+
+        .reviews-list {
+            margin-top: 30px;
+        }
+
+        .review-item {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .review-user {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .review-date {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .review-stars {
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+
+        .review-text {
+            color: #34495e;
+            line-height: 1.5;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+        }
+
+        .empty-state i {
+            font-size: 40px;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .back-button i {
+            margin-right: 5px;
+        }
+
+        .ride-rating {
+            margin-top: 10px;
+            color: #f39c12;
+            font-weight: 500;
+        }
+
+        .ride-rating i {
+            color: #f39c12;
+            margin-right: 5px;
+        }
+
+        .error-message {
+            background-color: var(--error-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .success-message {
+            background-color: var(--success-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Joy Ride Hub</h1>
+        </header>
+        <main>
+            <a href="ride_selection.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Back to Ride Selection
+            </a>
+            
+            <div class="user-info">
+                Welcome, <span id="username">User</span> | Entry Number: <span id="entryNumber">N/A</span>
+            </div>
+            
+            <div class="reviews-container">
+                <h2>Ride Reviews & Ratings</h2>
+                
+                <div class="ride-selector">
+                    <label for="ride-select">Select a Ride:</label>
+                    <select id="ride-select">
+                        <option value="roller-coaster">Roller Coaster</option>
+                        <option value="ferris-wheel">Ferris Wheel</option>
+                        <option value="water-slide">Water Slide</option>
+                        <option value="haunted-house">Haunted House</option>
+                    </select>
+                </div>
+                
+                <div class="rating-form">
+                    <h3>Write a Review</h3>
+                    <p>Share your experience with this ride:</p>
+                    
+                    <div class="star-rating" id="star-rating">
+                        <i class="fas fa-star" data-rating="1"></i>
+                        <i class="fas fa-star" data-rating="2"></i>
+                        <i class="fas fa-star" data-rating="3"></i>
+                        <i class="fas fa-star" data-rating="4"></i>
+                        <i class="fas fa-star" data-rating="5"></i>
+                    </div>
+                    
+                    <textarea id="review-text" placeholder="Write your review here..."></textarea>
+                    <button id="submit-review">Submit Review</button>
+                </div>
+                
+                <div class="reviews-list" id="reviews-list">
+                    <!-- Reviews will be loaded here -->
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <p>No reviews yet for this ride</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, orderBy, getDocs, Timestamp, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCyo_C5-hHmSmvfqbfdp5gA0NhxFAW5p7U",
+            authDomain: "amusmentpark-d93c8.firebaseapp.com",
+            projectId: "amusmentpark-d93c8",
+            storageBucket: "amusmentpark-d93c8.firebasestorage.app",
+            messagingSenderId: "462613440664",
+            appId: "1:462613440664:web:ebd0f80842cb32ca0f08ed",
+            measurementId: "G-QSX4M8RLYF"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // DOM Elements
+        const usernameElement = document.getElementById('username');
+        const entryNumberElement = document.getElementById('entryNumber');
+        const rideSelect = document.getElementById('ride-select');
+        const starRating = document.getElementById('star-rating');
+        const reviewText = document.getElementById('review-text');
+        const submitReviewButton = document.getElementById('submit-review');
+        const reviewsList = document.getElementById('reviews-list');
+
+        // User data
+        let userId = null;
+        let username = null;
+        let entryNumber = null;
+        let currentRating = 0;
+        let currentRide = "roller-coaster";
+
+        // Check if user is logged in
+        function checkUserLogin() {
+            username = localStorage.getItem("username");
+            entryNumber = localStorage.getItem("entryNumber");
+            userId = localStorage.getItem("userId");
+
+            if (!username || !userId) {
+                // Redirect to login page if not logged in
+                window.location.href = "index.html";
+                return;
+            }
+
+            // Display user info
+            usernameElement.textContent = username;
+            entryNumberElement.textContent = entryNumber;
+        }
+
+        // Initialize star rating
+        function initStarRating() {
+            const stars = starRating.querySelectorAll('i');
+            
+            stars.forEach(star => {
+                // Hover effect
+                star.addEventListener('mouseover', () => {
+                    const rating = parseInt(star.dataset.rating);
+                    highlightStars(rating);
+                });
+                
+                // Click to set rating
+                star.addEventListener('click', () => {
+                    currentRating = parseInt(star.dataset.rating);
+                    highlightStars(currentRating);
+                });
+            });
+            
+            // Reset stars when mouse leaves the container
+            starRating.addEventListener('mouseleave', () => {
+                highlightStars(currentRating);
+            });
+        }
+        
+        // Highlight stars up to a certain rating
+        function highlightStars(rating) {
+            const stars = starRating.querySelectorAll('i');
+            
+            stars.forEach(star => {
+                const starRating = parseInt(star.dataset.rating);
+                if (starRating <= rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        // Load reviews for the selected ride
+        async function loadReviews(rideId) {
+            try {
+                // Query reviews for this ride without ordering
+                const reviewsRef = collection(db, "ride_reviews");
+                const q = query(
+                    reviewsRef,
+                    where("rideId", "==", rideId)
+                    // Remove the orderBy to avoid needing a composite index
+                );
+                
+                const querySnapshot = await getDocs(q);
+                const reviews = [];
+                
+                querySnapshot.forEach((doc) => {
+                    reviews.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                // Sort reviews client-side instead
+                reviews.sort((a, b) => {
+                    const dateA = a.timestamp ? new Date(a.timestamp) : new Date(0);
+                    const dateB = b.timestamp ? new Date(b.timestamp) : new Date(0);
+                    return dateB - dateA; // Descending order (newest first)
+                });
+                
+                // Display reviews
+                if (reviews.length === 0) {
+                    reviewsList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-comments"></i>
+                            <p>No reviews yet for this ride</p>
+                        </div>
+                    `;
+                } else {
+                    reviewsList.innerHTML = reviews.map(review => `
+                        <div class="review-item">
+                            <div class="review-header">
+                                <div class="review-user">${review.username || 'Anonymous'}</div>
+                                <div class="review-date">${formatDate(review.timestamp)}</div>
+                            </div>
+                            <div class="review-stars">
+                                ${generateStars(review.rating)}
+                            </div>
+                            <div class="review-text">${review.text}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error("Error loading reviews:", error);
+                showMessage("Failed to load reviews: " + error.message, "error");
+            }
+        }
+        
+        // Generate star icons based on rating
+        function generateStars(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= rating) {
+                    stars += '<i class="fas fa-star"></i>';
+                } else {
+                    stars += '<i class="far fa-star"></i>';
+                }
+            }
+            return stars;
+        }
+        
+        // Format timestamp to readable date
+        function formatDate(timestamp) {
+            if (!timestamp) return 'Unknown date';
+            
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        // Submit a new review
+        async function submitReview() {
+            if (currentRating === 0) {
+                showMessage("Please select a rating", "error");
+                return;
+            }
+            
+            const text = reviewText.value.trim();
+            if (!text) {
+                showMessage("Please write a review", "error");
+                return;
+            }
+            
+            try {
+                // Create a new review document
+                const reviewRef = doc(collection(db, "ride_reviews"));
+                await setDoc(reviewRef, {
+                    rideId: currentRide,
+                    rideName: getRideName(currentRide),
+                    userId: userId,
+                    username: username,
+                    rating: currentRating,
+                    text: text,
+                    timestamp: serverTimestamp()
+                });
+                
+                // Update ride average rating
+                await updateRideRating(currentRide);
+                
+                // Clear form
+                reviewText.value = '';
+                currentRating = 0;
+                highlightStars(0);
+                
+                showMessage("Your review has been submitted!", "success");
+                
+                // Reload reviews
+                loadReviews(currentRide);
+            } catch (error) {
+                console.error("Error submitting review:", error);
+                showMessage("Failed to submit review: " + error.message, "error");
+            }
+        }
+        
+        // Update the average rating for a ride
+        async function updateRideRating(rideId) {
+            try {
+                // Get all reviews for this ride
+                const reviewsRef = collection(db, "ride_reviews");
+                const q = query(reviewsRef, where("rideId", "==", rideId));
+                const querySnapshot = await getDocs(q);
+                
+                let totalRating = 0;
+                let reviewCount = 0;
+                
+                querySnapshot.forEach((doc) => {
+                    const review = doc.data();
+                    totalRating += review.rating;
+                    reviewCount++;
+                });
+                
+                const averageRating = reviewCount > 0 ? totalRating / reviewCount : 0;
+                
+                // Update ride document with new average rating
+                const rideRef = doc(db, "rides", rideId);
+                await updateDoc(rideRef, {
+                    averageRating: averageRating,
+                    reviewCount: reviewCount
+                });
+            } catch (error) {
+                console.error("Error updating ride rating:", error);
+            }
+        }
+        
+        // Get ride name from ride ID
+        function getRideName(rideId) {
+            const rides = {
+                "roller-coaster": "Roller Coaster",
+                "ferris-wheel": "Ferris Wheel",
+                "water-slide": "Water Slide",
+                "haunted-house": "Haunted House"
+            };
+            return rides[rideId] || "Unknown Ride";
+        }
+        
+        // Show error or success message
+        function showMessage(message, type) {
+            // Remove any existing messages
+            const existingMessages = document.querySelectorAll('.error-message, .success-message');
+            existingMessages.forEach(msg => msg.remove());
+            
+            // Create and show new message
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
+            messageDiv.textContent = message;
+            
+            const form = document.querySelector('.rating-form');
+            form.insertBefore(messageDiv, form.firstChild);
+            
+            // Remove message after 3 seconds
+            setTimeout(() => messageDiv.remove(), 3000);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            checkUserLogin();
+            initStarRating();
+            loadReviews(currentRide);
+            
+            // Change ride event
+            rideSelect.addEventListener('change', () => {
+                currentRide = rideSelect.value;
+                loadReviews(currentRide);
+            });
+            
+            // Submit review event
+            submitReviewButton.addEventListener('click', submitReview);
+        });
+    </script>
+</body>
+</html>
